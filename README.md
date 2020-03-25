@@ -11,7 +11,7 @@ Link for creating access token:
 https://sandbox.zenodo.org/account/settings/applications/tokens/new/
 
 Todo:
-- command line options
+- actually using the command line options
 - converting UTF-8 plaintext to html (for the zenodo description)
 - handling entire directories and updates
 - demon mode

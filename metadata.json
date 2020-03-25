@@ -1,0 +1,19 @@
+{
+    "metadata": {
+        "title": "automatic9 WWV 5MHz Frequency Measurements from Cleveland, OH, USA",
+        "upload_type": "dataset",
+        "description": "description here",
+        "creators": [
+            {"name": "Kazdan, David", "affiliation": "Case Western Reserve University"}
+        ],
+        "keywords": ["wwv"],
+        "communities": [{"identifier": "hamsci-test"}],
+        "locations": [
+            {
+                "lat": 41.493744,
+                "lon": -81.578039,
+                "place": "location where recordings are made"
+            }
+        ]
+    }
+}
