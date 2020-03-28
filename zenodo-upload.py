@@ -23,7 +23,7 @@ def read_access_token():
 parser = argparse.ArgumentParser(
     description="Upload the given file(s) to Zenodo via the REST API."
                 " Currently only works with a single file, not directories.")
-parser.add_argument('path',
+parser.add_argument('--path',
                     default='C:\\Users\\aidan\\Documents\\W8EDU\\psws-zenodo\\test-files\\2020-03-16-WWV5.csv',
                     help="The file(s) to include in the upload.")
 # parser.add_argument('-m', '--metadata-file',
@@ -66,7 +66,7 @@ with open(description_file, 'r') as f:
 
 data = {
     "metadata": {
-        "title": "automatic12 WWV 5MHz Frequency Measurements from Cleveland, OH, USA",
+        "title": "automatic13 WWV 5MHz Frequency Measurements from Cleveland, OH, USA",
         "upload_type": "dataset",
         "description": description_text,
         "creators": [
@@ -113,3 +113,41 @@ print("Response:")
 print(json.dumps(r_p.json(), indent=2))
 
 webbrowser.open(r_p.json()['links']['record_html'])
+
+
+def getAllDepositionsOfUser():
+    """Get all the depositions of the user thus far, and return
+    a simplified list of deposition objects"""
+        
+    page = 1 # page of the depositions list we are looking at
+    cache = []
+    
+    while True:
+        request = requests.get(url,
+                               params={'access_token': args.token, 'page': page})
+        
+        if request.status_code != 200:
+            print("API fail with status code", request.status_code)
+            break
+        
+        if not request.json():
+            break
+        
+        for deposition in request.json():
+            cache.append({"id": deposition["id"]})
+            if deposition["submitted"]:
+                cache[len(cache) - 1]["submitted"] = True
+                cache[len(cache) - 1]["link"] = deposition["links"]["record_html"]
+            else:
+                cache[len(cache) - 1]["submitted"] = False
+                cache[len(cache) - 1]["link"] = deposition["links"]["html"]
+            
+            if "files" in deposition:
+                cache[len(cache) - 1]["files"] = []
+                for file in deposition["files"]:
+                    cache[len(cache) - 1]["files"].append({"filename": file["filename"],
+                                                           "checksum": file["checksum"]})
+                    
+        page += 1
+    
+    return cache
