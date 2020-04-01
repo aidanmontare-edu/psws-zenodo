@@ -26,7 +26,7 @@ def read_access_token():
 
 parser = argparse.ArgumentParser(
     description="Upload the given file(s) to Zenodo via the REST API."
-                " Currently only works with a single file, not directories.")
+                " In development, so arguments and behavior my vary.")
 parser.add_argument('--path',
                     default='C:\\Users\\aidan\\Documents\\W8EDU\\psws-zenodo\\test-files',
                     help="The file(s) to include in the upload.")
@@ -39,6 +39,11 @@ parser.add_argument('-t', '--token', default=read_access_token(),
 # parser.add_argument('-c', '--check',
 #                     help="Check if the file(s) at <path> are"
 #                     " already uploaded to your Zenodo account.")
+parser.add_argument('-w', '--watch', action='store_true',
+                    help="Instead of running once, run continuously "
+                    " and watch for changes to the file(s) at the"
+                    " specified path(s). An upload will be triggered"
+                    " anytime a change is detected")
 # parser.add_argument('-d', '--daemon',
 #                     help="Daemon mode. Runs in the background,"
 #                     " and checks once per day which files have"
@@ -83,12 +88,49 @@ if args.sandbox != target["onZenodoSandboxServer"]:
 
 target_url = url + "/" + str(target["id"])
 
+def makeRequest(kind, url, params=None, **kwargs):
+    """
+    Makes an http request of the specified kind, and does
+    a bunch of other useful things
+
+    Parameters
+    ----------
+    kind : TYPE
+        DESCRIPTION.
+    url : TYPE
+        DESCRIPTION.
+    **kwargs : TYPE
+        DESCRIPTION.
+
+    Returns
+    -------
+    None.
+
+    """
+    if params is None:
+        params = {}
+    
+    params["access_token"] = args.token
+    
+    print(kwargs)
+    
+    response = getattr(requests, kind)(url, params=params, **kwargs)
+    
+    print(response.url)
+    
+    # raise exceptions if an unsuccessful HTTP code is returned
+    response.raise_for_status()
+    
+    return response
+
 def do():
     """Just do it!"""
+    
     global target_url
     
     # get the most recent version of the target
     r = requests.get(target_url, params={'access_token': args.token})
+    # r = makeRequest("get", target_url)
     
     if "latest_draft" in r.json()["links"]:
         # target_url = r.json()["links"]["latest_draft"]
@@ -97,7 +139,7 @@ def do():
         # and this situation is likely unsafe anyway
         raise Exception("The deposition already has an unpublished draft."
                         " Please deal with this on the Zenodo website:\n" +
-                        r.json()["links"]["latest_draft"])
+                        r.json()["links"]["latest_draft_html"])
     else:
         latest_target_id = r.json()["links"]["latest"].rsplit("/", 1)[-1]
         target_url = url + "/" + str(latest_target_id)
@@ -105,11 +147,7 @@ def do():
     # get files for deposition
     request = requests.get(target_url + "/files",
                            params={'access_token': args.token})
-    
-    if request.status_code != 200:
-        print("API fail with status code", request.status_code)
-        
-    files = request.json()
+    # request = makeRequest("get", target_url + "/files")
     
     BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
     
@@ -137,33 +175,57 @@ def do():
         
     # see which files are in the upload
     # find the files that are not uploaded
+    to_be_updated = []
     to_be_uploaded = []
     
     for local_file in cwd_files:
+        matchedExact = False
         matched = False
+        
         for zenodo_file in request.json():
-            if checksums[local_file] == zenodo_file["checksum"]:
-                #print("Match! local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
+            if local_file.name.replace(" ", "_") == zenodo_file["filename"]:
                 matched = True
-            else:
-                None
-                #print("No match. local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
                 
-        if matched:
-            print("{0} has already been uploaded.".format(local_file.name))
+                if checksums[local_file] == zenodo_file["checksum"]:
+                    #print("Match! local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
+                    matchedExact = True
+                else:
+                    None
+                    #print("No match. local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
+        
+        if matchedExact:
+            print(local_file.name, "is uploaded in current form.")
+        elif matched:
+            print(local_file.name, "needs updating.")
+            to_be_updated.append(local_file)
+            to_be_uploaded.append(local_file)
         else:
-            print("{0} has not been uploaded.".format(local_file.name))
+            print(local_file.name, "has not been uploaded")
             to_be_uploaded.append(local_file)
     
     if len(to_be_uploaded) == 0:
-        print("Nothing to upload. Goodbye!")
+        print("Nothing to upload.")
+        return
     
     # create a new version of the deposition so that we can add files
     r = requests.post(target_url + "/actions/newversion",
                       params={'access_token': args.token})
+    # r = makeRequest("post", target_url + "/actions/newversion")
     
     # get the new version
     new_target_url = r.json()["links"]["latest_draft"]
+    
+    request = requests.get(new_target_url + "/files",
+                           params={'access_token': args.token})
+    
+    # delete deposition files for the files that will be updated
+    for file in to_be_updated:
+        for zenodo_file in request.json():
+            if file.name.replace(" ", "_") == zenodo_file["filename"]:
+                r = requests.delete(zenodo_file["links"]["self"],
+                                    params={'access_token': args.token})
+                print("Deleted deposition file with status code", r.status_code)
+                break
     
     # upload the not-yet-uploaded files
     for file in to_be_uploaded:
@@ -173,12 +235,25 @@ def do():
                              data={'name': file.name},
                              files={'file': file.read_bytes()},
                              params={'access_token': args.token})
+        # r_df = makeRequest("post",
+        #                    new_target_url + "/files",
+        #                    data={'name': file.name},
+        #                    files={'file': file.read_bytes()})
         
         print("Sent file with status code", r_df.status_code)
+        
+        if r_df.status_code==400:
+            print(r_df.json())
     
     # publish the new deposiiton version
     r = requests.post(new_target_url + "/actions/publish",
                       params={'access_token': args.token})
+    # r = makeRequest("post", new_target_url + "/actions/publish")
+    
+    print("Published deposition with status code", r.status_code)
+    
+    if r.status_code==400:
+        print(r.json())
 
 # description_file = "C:\\Users\\aidan\\Documents\\W8EDU\\psws-zenodo\\test-files\\Readme_5_Mhz Cleveland Heights.txt"
 # description_text = ""
@@ -294,29 +369,36 @@ class UploadingEventHandler(LoggingEventHandler):
     def on_created(self, event):
         super(UploadingEventHandler, self).on_created(event)
 
-        doWrap()
+        do()
 
     def on_modified(self, event):
         super(UploadingEventHandler, self).on_modified(event)
 
-        doWrap()
+        do()
 
 
+def watch():
+    """Implementation of -w/--watch option."""
+    
+    print("Starting watchdog")
+    logging.basicConfig(level=logging.INFO,
+                        format='%(asctime)s - %(message)s',
+                        datefmt='%Y-%m-%d %H:%M:%S')
+    event_handler = UploadingEventHandler()
+    observer = Observer()
+    observer.schedule(event_handler, args.path, recursive=True)
+    observer.start()
+    print("Awaiting new changes")
+    try:
+        while observer.isAlive():
+            print("loop started")
+            observer.join()
+    except KeyboardInterrupt:
+        print("Stopping")
+        observer.stop()
+    observer.join()
 
-
-print("Starting watchdog")
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s - %(message)s',
-                    datefmt='%Y-%m-%d %H:%M:%S')
-event_handler = UploadingEventHandler()
-observer = Observer()
-observer.schedule(event_handler, args.path, recursive=True)
-observer.start()
-print("Awaiting new changes")
-try:
-    while observer.isAlive():
-        observer.join(1)
-except KeyboardInterrupt:
-    print("Stopping")
-    observer.stop()
-observer.join()
+if args.watch:
+    watch()
+else:
+    do()
