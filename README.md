@@ -16,4 +16,5 @@ Todo:
 - handling entire directories and updates
 - demon mode
 - error handling
+- restructure request-making to raise exceptions with bad http responses
 - tests
