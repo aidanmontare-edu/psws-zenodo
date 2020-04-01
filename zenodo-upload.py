@@ -3,14 +3,15 @@
 Uploads to Zenodo via the REST API
 """
 
-import os
-import sys
 from pathlib import Path
 import hashlib
 import json
 import requests
 import argparse
 import webbrowser
+import logging
+from watchdog.observers import Observer
+from watchdog.events import LoggingEventHandler
 
 def read_access_token():
     """Reads the access token from `secrets.json` file."""
@@ -82,99 +83,102 @@ if args.sandbox != target["onZenodoSandboxServer"]:
 
 target_url = url + "/" + str(target["id"])
 
-# get the most recent version of the target
-r = requests.get(target_url, params={'access_token': args.token})
-
-if "latest_draft" in r.json()["links"]:
-    # target_url = r.json()["links"]["latest_draft"]
-    # there is already a new draft for this deposition
-    # the API will not allow more than one draft at a time,
-    # and this situation is likely unsafe anyway
-    raise Exception("The deposition already has an unpublished draft."
-                    " Please deal with this on the Zenodo website:\n" +
-                    r.json()["links"]["latest_draft"])
-else:
-    latest_target_id = r.json()["links"]["latest"].rsplit("/", 1)[-1]
-    target_url = url + "/" + str(latest_target_id)
-
-# get files for deposition
-request = requests.get(target_url + "/files",
-                       params={'access_token': args.token})
-
-if request.status_code != 200:
-    print("API fail with status code", request.status_code)
+def do():
+    """Just do it!"""
+    global target_url
     
-files = request.json()
-
-BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
-
-# get the files in the current directory that do not
-# start with '.'
-cwd_files = [path for path in Path(args.path).glob("*")
-             if path.is_file() and path.name[0] != '.']
-
-# find the checksums of all the files
-checksums = {}
-
-for file in cwd_files:
-    md5 = hashlib.md5()
+    # get the most recent version of the target
+    r = requests.get(target_url, params={'access_token': args.token})
     
-    with open(file, 'rb') as f:
-        while True:
-            data = f.read(BUF_SIZE)
-            if not data:
-                break
-            md5.update(data)
-    
-    checksums[file] = md5.hexdigest()
-    
-    #print(file.name + " " + md5.hexdigest())
-    
-# see which files are in the upload
-# find the files that are not uploaded
-to_be_uploaded = []
-
-for local_file in cwd_files:
-    matched = False
-    for zenodo_file in request.json():
-        if checksums[local_file] == zenodo_file["checksum"]:
-            #print("Match! local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
-            matched = True
-        else:
-            None
-            #print("No match. local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
-            
-    if matched:
-        print("{0} has already been uploaded.".format(local_file.name))
+    if "latest_draft" in r.json()["links"]:
+        # target_url = r.json()["links"]["latest_draft"]
+        # there is already a new draft for this deposition
+        # the API will not allow more than one draft at a time,
+        # and this situation is likely unsafe anyway
+        raise Exception("The deposition already has an unpublished draft."
+                        " Please deal with this on the Zenodo website:\n" +
+                        r.json()["links"]["latest_draft"])
     else:
-        print("{0} has not been uploaded.".format(local_file.name))
-        to_be_uploaded.append(local_file)
-
-if len(to_be_uploaded) == 0:
-    print("Nothing to upload. Goodbye!")
-    sys.exit()
-
-# create a new version of the deposition so that we can add files
-r = requests.post(target_url + "/actions/newversion",
-                  params={'access_token': args.token})
-
-# get the new version
-new_target_url = r.json()["links"]["latest_draft"]
-
-# upload the not-yet-uploaded files
-for file in to_be_uploaded:
-    print("Uploading", file.name)
-    # create deposition file (upload a file)
-    r_df = requests.post(new_target_url + "/files",
-                         data={'name': file.name},
-                         files={'file': file.read_bytes()},
-                         params={'access_token': args.token})
+        latest_target_id = r.json()["links"]["latest"].rsplit("/", 1)[-1]
+        target_url = url + "/" + str(latest_target_id)
     
-    print("Sent file with status code", r_df.status_code)
-
-# publish the new deposiiton version
-r = requests.post(new_target_url + "/actions/publish",
-                  params={'access_token': args.token})
+    # get files for deposition
+    request = requests.get(target_url + "/files",
+                           params={'access_token': args.token})
+    
+    if request.status_code != 200:
+        print("API fail with status code", request.status_code)
+        
+    files = request.json()
+    
+    BUF_SIZE = 65536  # lets read stuff in 64kb chunks!
+    
+    # get the files in the current directory that do not
+    # start with '.'
+    cwd_files = [path for path in Path(args.path).glob("*")
+                 if path.is_file() and path.name[0] != '.']
+    
+    # find the checksums of all the files
+    checksums = {}
+    
+    for file in cwd_files:
+        md5 = hashlib.md5()
+        
+        with open(file, 'rb') as f:
+            while True:
+                data = f.read(BUF_SIZE)
+                if not data:
+                    break
+                md5.update(data)
+        
+        checksums[file] = md5.hexdigest()
+        
+        #print(file.name + " " + md5.hexdigest())
+        
+    # see which files are in the upload
+    # find the files that are not uploaded
+    to_be_uploaded = []
+    
+    for local_file in cwd_files:
+        matched = False
+        for zenodo_file in request.json():
+            if checksums[local_file] == zenodo_file["checksum"]:
+                #print("Match! local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
+                matched = True
+            else:
+                None
+                #print("No match. local_file: {0}, zenodo_file: {1}".format(local_file.name, zenodo_file["filename"]))
+                
+        if matched:
+            print("{0} has already been uploaded.".format(local_file.name))
+        else:
+            print("{0} has not been uploaded.".format(local_file.name))
+            to_be_uploaded.append(local_file)
+    
+    if len(to_be_uploaded) == 0:
+        print("Nothing to upload. Goodbye!")
+    
+    # create a new version of the deposition so that we can add files
+    r = requests.post(target_url + "/actions/newversion",
+                      params={'access_token': args.token})
+    
+    # get the new version
+    new_target_url = r.json()["links"]["latest_draft"]
+    
+    # upload the not-yet-uploaded files
+    for file in to_be_uploaded:
+        print("Uploading", file.name)
+        # create deposition file (upload a file)
+        r_df = requests.post(new_target_url + "/files",
+                             data={'name': file.name},
+                             files={'file': file.read_bytes()},
+                             params={'access_token': args.token})
+        
+        print("Sent file with status code", r_df.status_code)
+    
+    # publish the new deposiiton version
+    r = requests.post(new_target_url + "/actions/publish",
+                      params={'access_token': args.token})
 
 # description_file = "C:\\Users\\aidan\\Documents\\W8EDU\\psws-zenodo\\test-files\\Readme_5_Mhz Cleveland Heights.txt"
 # description_text = ""
@@ -270,3 +274,49 @@ def getAllDepositionsOfUser():
         page += 1
     
     return cache
+
+
+
+
+def doWrap():
+    global observer
+    
+    observer.stop()
+    do()
+    observer.start()
+
+class UploadingEventHandler(LoggingEventHandler):
+    """
+    Logs all the events captured, and triggers the upload process
+    to start
+    """
+
+    def on_created(self, event):
+        super(UploadingEventHandler, self).on_created(event)
+
+        doWrap()
+
+    def on_modified(self, event):
+        super(UploadingEventHandler, self).on_modified(event)
+
+        doWrap()
+
+
+
+
+print("Starting watchdog")
+logging.basicConfig(level=logging.INFO,
+                    format='%(asctime)s - %(message)s',
+                    datefmt='%Y-%m-%d %H:%M:%S')
+event_handler = UploadingEventHandler()
+observer = Observer()
+observer.schedule(event_handler, args.path, recursive=True)
+observer.start()
+print("Awaiting new changes")
+try:
+    while observer.isAlive():
+        observer.join(1)
+except KeyboardInterrupt:
+    print("Stopping")
+    observer.stop()
+observer.join()
