@@ -1,1 +1,2 @@
-secrets.json
+config/
+config/secrets.json

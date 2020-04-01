@@ -16,12 +16,12 @@ def read_access_token():
     """Reads the access token from `secrets.json` file."""
     try:
         # We store our various secrets in an aptly named file
-        with open('secrets.json', 'r') as data_file:
+        with open('config/secrets.json', 'r') as data_file:
             return json.load(data_file)['access_token']
     except FileNotFoundError:
         raise Exception("You must either provide an access token"
                         " on the commnad line or in the file"
-                        " `secrets.json`")
+                        " `config/secrets.json`")
 
 parser = argparse.ArgumentParser(
     description="Upload the given file(s) to Zenodo via the REST API."
@@ -34,7 +34,7 @@ parser.add_argument('--path',
 parser.add_argument('-t', '--token', default=read_access_token(),
                     help="Access token for the Zenodo account you wish"
                     " to upload to. If no token is specified, the token"
-                    " stored in the file `secrets.json` is used.")
+                    " stored in the file `config/secrets.json` is used.")
 # parser.add_argument('-c', '--check',
 #                     help="Check if the file(s) at <path> are"
 #                     " already uploaded to your Zenodo account.")
@@ -64,11 +64,11 @@ else:
 
 # read current-target.json
 try:
-    with open('current-target.json', 'r') as data_file:
+    with open('config/current-target.json', 'r') as data_file:
         target = json.load(data_file)
 except FileNotFoundError:
     raise Exception("You must provide a target in the file"
-                    " `current-target.json`")
+                    " `config/current-target.json`")
         
 print("Target id:", target["id"])
 
