@@ -1,7 +1,8 @@
 # psws-zenodo
 Zenodo upload for the HamSCI PSWS project and those running fldigi at home
 
-*This is still in a very rough phase, and has very little error checking.*
+*This is only a proof of concept. It is still in a very rough phase, and has
+very little error checking.*
 
 To use:
 
@@ -40,3 +41,5 @@ Todo:
 - restructure request-making to raise exceptions with bad http responses
 - tests
 - support for both sandbox and regular servers
+- licensing
+- notice to user about picking license
