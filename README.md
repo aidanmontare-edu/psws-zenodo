@@ -13,6 +13,10 @@ Python 3 as `pip3`):
 
 `pip3 install --upgrade -i https://test.pypi.org/simple/ --no-deps psws-zendo`
 
+Once you have this, you should be able to run it with
+`python3 psws-zenodo.py` or `psws-zenodo.py`. Note that reading the
+config files may not work yet.
+
 In the future, this project will be hosted on the main Python Package Index.
 
 To use:
@@ -44,7 +48,6 @@ Link for creating access token:
 https://sandbox.zenodo.org/account/settings/applications/tokens/new/
 
 Todo:
-- actually using the command line options
 - converting UTF-8 plaintext to html (for the zenodo description)
 - handling entire directories and updates
 - demon mode
@@ -56,3 +59,8 @@ Todo:
 - notice to user about picking license
 - https://requests-oauthlib.readthedocs.io/en/latest/examples/github.html
 
+I think eventually the entry_points option will be better.
+
+entry_points={
+        "console_scripts": [
+            "pip=pip._internal.cli.main:main",

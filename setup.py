@@ -1,13 +1,33 @@
 # -*- coding: utf-8 -*-
 
 import setuptools
+import codecs
+import os
+
+"""Thanks to pip"""
+
+def read(rel_path):
+    here = os.path.abspath(os.path.dirname(__file__))
+    # intentionally *not* adding an encoding option to open, See:
+    #   https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
+    with codecs.open(os.path.join(here, rel_path), 'r') as fp:
+        return fp.read()
+
+def get_version(rel_path):
+    for line in read(rel_path).splitlines():
+        if line.startswith('__version__'):
+            # __version__ = "0.9"
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="psws-zendo",
-    version="0.0.6",
+    version=get_version("zenodo-upload.py"),
     author="Aidan Montare",
     author_email="aidan.montare@case.edu",
     description="Zenodo upload for the HamSCI PSWS project and those running fldigi at home",

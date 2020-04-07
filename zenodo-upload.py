@@ -4,7 +4,10 @@
 Uploads to Zenodo via the REST API
 """
 
+__version__ = "0.0.7"
+
 from pathlib import Path
+import sys
 import hashlib
 import json
 import requests
@@ -56,11 +59,18 @@ parser.add_argument('-s', '--sandbox', action='store_true',
                     " zenodo.org. You will need to create an account on the"
                     " sandbox server, and an access token for that account,"
                     " if you do not already have these.")
+parser.add_argument('-V', '--version', action='store_true',
+                    dest='version',
+                    help="Show the version number and exit.")
 # parser.add_argument('--show-urls', action='store_true',
 #                     help="Whenever the program output mentions a Zenodo"
 #                     " file or upload, also output a URL to it.")
 
 args = parser.parse_args()
+
+if args.version:
+    print(__version__)
+    sys.exit()
 
 if args.token=="":
     None
