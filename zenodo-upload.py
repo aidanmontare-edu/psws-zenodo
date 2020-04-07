@@ -4,7 +4,7 @@
 Uploads to Zenodo via the REST API
 """
 
-__version__ = "0.0.8.post1"
+__version__ = "0.0.8.post2"
 
 from pathlib import Path
 import sys
