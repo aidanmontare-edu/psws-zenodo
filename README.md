@@ -1,4 +1,6 @@
 # psws-zenodo
+![Upload Python Package](https://github.com/aidanmontare-edu/psws-zenodo/workflows/Upload%20Python%20Package/badge.svg)
+
 Zenodo upload for the HamSCI PSWS project and those running fldigi at home
 
 *This is only a proof of concept. It is still in a very rough phase, and has
