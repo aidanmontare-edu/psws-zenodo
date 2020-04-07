@@ -7,7 +7,7 @@ very little error checking.*
 To install:
 
 This project is currently
-(hosted on the Test PyPI server)[https://test.pypi.org/project/psws-zendo/].
+[hosted on the Test PyPI server](https://test.pypi.org/project/psws-zendo/).
 You can download it from there by running (assuming your system has pip for 
 Python 3 as `pip3`):
 
