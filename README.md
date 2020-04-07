@@ -4,6 +4,17 @@ Zenodo upload for the HamSCI PSWS project and those running fldigi at home
 *This is only a proof of concept. It is still in a very rough phase, and has
 very little error checking.*
 
+To install:
+
+This project is currently
+(hosted on the Test PyPI server)[https://test.pypi.org/project/psws-zendo/].
+You can download it from there by running (assuming your system has pip for 
+Python 3 as `pip3`):
+
+`pip3 install --upgrade -i https://test.pypi.org/simple/ --no-deps psws-zendo`
+
+In the future, this project will be hosted on the main Python Package Index.
+
 To use:
 
 1. Edit the script place your default path in for `--path`, or get used to
@@ -43,3 +54,5 @@ Todo:
 - support for both sandbox and regular servers
 - licensing
 - notice to user about picking license
+- https://requests-oauthlib.readthedocs.io/en/latest/examples/github.html
+

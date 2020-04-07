@@ -2,3 +2,10 @@ config/
 config/secrets.json
 
 test-files/
+
+# Building
+build/
+dist/
+.pylint.d/
+*.egg
+*.egg-info
