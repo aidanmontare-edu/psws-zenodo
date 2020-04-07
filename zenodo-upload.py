@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Uploads to Zenodo via the REST API
@@ -36,9 +37,10 @@ parser.add_argument('-t', '--token', default=read_access_token(),
                     help="Access token for the Zenodo account you wish"
                     " to upload to. If no token is specified, the token"
                     " stored in the file `config/secrets.json` is used.")
-# parser.add_argument('-c', '--check',
-#                     help="Check if the file(s) at <path> are"
-#                     " already uploaded to your Zenodo account.")
+parser.add_argument('-c', '--check', action='store_true',
+                    help="Check if the file(s) at <path> are"
+                    " already uploaded to your Zenodo account,"
+                    " but don't make any changes.")
 parser.add_argument('-w', '--watch', action='store_true',
                     help="Instead of running once, run continuously "
                     " and watch for changes to the file(s) at the"
@@ -88,6 +90,11 @@ if args.sandbox != target["onZenodoSandboxServer"]:
 
 target_url = url + "/" + str(target["id"])
 
+if not Path(args.path).exists():
+    raise Exception("The local path does not"
+                    " exist on the system. This is likely"
+                    " an error.")
+
 def makeRequest(kind, url, params=None, **kwargs):
     """
     Makes an http request of the specified kind, and does
@@ -123,8 +130,23 @@ def makeRequest(kind, url, params=None, **kwargs):
     
     return response
 
-def do():
-    """Just do it!"""
+def compareToTargetURL():
+    """
+    Checks the local directory against the zenodo target_url.
+
+    Raises
+    ------
+    Exception
+        When there is already an unpublished draft of this resource.
+
+    Returns
+    -------
+    to_be_updated : TYPE
+        DESCRIPTION.
+    to_be_uploaded : TYPE
+        DESCRIPTION.
+
+    """
     
     global target_url
     
@@ -153,13 +175,18 @@ def do():
     
     # get the files in the current directory that do not
     # start with '.'
-    cwd_files = [path for path in Path(args.path).glob("*")
+    local_files = [path for path in Path(args.path).glob("*")
                  if path.is_file() and path.name[0] != '.']
+    
+    print(local_files)
     
     # find the checksums of all the files
     checksums = {}
     
-    for file in cwd_files:
+    for file in local_files:
+        if not file.exists():
+            raise Exception(file.name, "does not exist")
+        
         md5 = hashlib.md5()
         
         with open(file, 'rb') as f:
@@ -178,7 +205,7 @@ def do():
     to_be_updated = []
     to_be_uploaded = []
     
-    for local_file in cwd_files:
+    for local_file in local_files:
         matchedExact = False
         matched = False
         
@@ -202,6 +229,14 @@ def do():
         else:
             print(local_file.name, "has not been uploaded")
             to_be_uploaded.append(local_file)
+            
+    return to_be_updated, to_be_uploaded
+
+
+def do():
+    """Just do it!"""
+    
+    to_be_updated, to_be_uploaded = compareToTargetURL()
     
     if len(to_be_uploaded) == 0:
         print("Nothing to upload.")
@@ -400,5 +435,30 @@ def watch():
 
 if args.watch:
     watch()
+elif args.check:
+    
+    print("Comparing local to remote...")
+    print("Local:", args.path)
+    print("Remote:", target_url)
+    
+    to_be_updated, to_be_uploaded = compareToTargetURL()
+    
+    print()
+    
+    if to_be_updated:
+        print("Old version will be removed:")
+        for file in to_be_updated:
+            print(file.name)
+    else:
+        print("No existing upload files to modify.")
+    
+    print()
+    
+    if to_be_uploaded:
+        print("Will be uploaded:")
+        for file in to_be_uploaded:
+            print(file.name)
+    else:
+        print("No new files to upload.")
 else:
     do()
