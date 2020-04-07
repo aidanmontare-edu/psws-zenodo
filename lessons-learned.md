@@ -11,3 +11,9 @@ it will:
 
 Those metadata icon things that you see at the top of everyone's README.md files can be generated at: https://shields.io/.
 GitHub Actions also provides their own versions for some things.
+
+## Reading list
+CLI's
+- https://docs.builtoncement.com/
+- https://pypi.org/project/clint/ (has column printing, config file placement)
+- Electron? (probably not)
