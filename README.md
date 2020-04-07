@@ -1,4 +1,5 @@
 # psws-zenodo
+![GitHub tag (latest pre-release)](https://img.shields.io/github/v/tag/aidanmontare-edu/psws-zenodo?include_prereleases)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/aidanmontare-edu/psws-zenodo?include_prereleases)
 ![Upload Python Package](https://github.com/aidanmontare-edu/psws-zenodo/workflows/Upload%20Python%20Package/badge.svg)
 ![PyPI](https://img.shields.io/pypi/v/psws-zenodo)
