@@ -8,7 +8,8 @@
 5. Will automatically build and transfer to Test PyPI
 
 # Build Process
-Taken care of by GitHub
+Taken care of by GitHub to publish to Test PyPI. Use this if you want to build
+locally.
 
 based on https://packaging.python.org/tutorials/packaging-projects
 

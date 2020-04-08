@@ -13,7 +13,7 @@ To install:
 
 This project is currently
 [hosted on the Test PyPI server](https://test.pypi.org/project/psws-zendo/).
-You can download it from there by running (assuming your system has pip for 
+You can download it from there by running (assuming your system has pip for
 Python 3 as `pip3`):
 
 `pip3 install --upgrade -i https://test.pypi.org/simple/ --no-deps psws-zendo`
@@ -63,9 +63,13 @@ Todo:
 - licensing
 - notice to user about picking license
 - https://requests-oauthlib.readthedocs.io/en/latest/examples/github.html
+- https://docs.python.org/3.5/library/enum.html
+- I think eventually the entry_points option will be better.
 
-I think eventually the entry_points option will be better.
-
+```
 entry_points={
         "console_scripts": [
             "pip=pip._internal.cli.main:main",
+```
+
+https://packaging.python.org/guides/distributing-packages-using-setuptools/#entry-points
