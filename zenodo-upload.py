@@ -4,7 +4,7 @@
 Uploads to Zenodo via the REST API
 """
 
-__version__ = "0.0.8.post3"
+__version__ = "0.1.0"
 
 from pathlib import Path
 import sys
@@ -16,6 +16,7 @@ import webbrowser
 import logging
 from watchdog.observers import Observer
 from watchdog.events import LoggingEventHandler
+from datetime import datetime, timezone
 
 def read_access_token():
     """Reads the access token from `secrets.json` file."""
@@ -289,6 +290,12 @@ def do():
         
         if r_df.status_code==400:
             print(r_df.json())
+    
+    now = datetime.now(timezone.utc)
+    # update the date on the deposition
+    r = requests.put(new_target_url,
+                     data={"metadata": {"publication_date": now.isoformat()}})
+    print("Changed time with status code", r.status_code)
     
     # publish the new deposiiton version
     r = requests.post(new_target_url + "/actions/publish",
