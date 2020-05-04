@@ -11,6 +11,9 @@ very little error checking.*
 
 To install:
 
+**Note: it's probably better for now to run this code by downloading the
+repository directly, rather than trying to use PyPI**
+
 This project is currently
 [hosted on the Test PyPI server](https://test.pypi.org/project/psws-zendo/).
 You can download it from there by running (assuming your system has pip for
