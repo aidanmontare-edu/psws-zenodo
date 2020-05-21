@@ -317,7 +317,7 @@ def do():
                      headers={"Content-Type": "application/json"})
     print("Changed time with status code", r.status_code)
     
-    if r.status_code == 401:
+    if r.status_code != 200:
         print(r.json())
     
     # publish the new deposiiton version
