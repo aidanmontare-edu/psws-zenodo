@@ -310,9 +310,10 @@ def do():
             print(r_df.json())
     
     now = datetime.now(timezone.utc)
+    data={"metadata": {"publication_date": now.isoformat()}}
     # update the date on the deposition
     r = requests.put(new_target_url,
-                     data={"metadata": {"publication_date": now.isoformat()}},
+                     data=json.dumps(data),
                      params={'access_token': args.token},
                      headers={"Content-Type": "application/json"})
     print("Changed time with status code", r.status_code)
