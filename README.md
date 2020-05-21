@@ -11,8 +11,7 @@ very little error checking.*
 
 To install:
 
-**Note: it's probably better for now to run this code by downloading the
-repository directly, rather than trying to use PyPI**
+**Note: While this code is published as a test package, the packaged form does not work correctly yet. For now, you should run this code by downloading the repository directly, rather than trying to use PyPI**
 
 This project is currently
 [hosted on the Test PyPI server](https://test.pypi.org/project/psws-zendo/).
@@ -29,26 +28,32 @@ In the future, this project will be hosted on the main Python Package Index.
 
 To use:
 
-1. Edit the script place your default path in for `--path`, or get used to
-supplying the command line argument.
-2. Create an account at sandbox.zenodo.org and then an access token. Your
+1. Create an account at sandbox.zenodo.org and then an access token. Your
 access token must both the `deposit:action` and the `deposit:write` scopes.
-3. Rename/copy the `example-config` directory as `config`, and set your
-configuration settings. The access token goes in the file `secrets.json`
-(an example, sans token, has been provided). In the file
+2. Rename/copy the `example-config` directory as `config`, and set your
+configuration settings. There are several to set.
+
+The access token goes in the file `secrets.json`
+(an example, sans token, has been provided).
+
+The path to the files you wish to have uploaded to Zenodo (i.e. your data)
+should be set as `local_path`. You can also specify this as a command line argument.
+
+In the file
 `current-target.json`, "onZenodoSandboxServer" is either
 1 if you are using sandbox.zenodo.org, or 0 for zenodo.org. We'll get the
 value of "id" once we create a Zenodo upload.
-4. From the Zenodo website, create a new Zenodo upload and specify all the
+
+3. From the Zenodo website, create a new Zenodo upload and specify all the
 metadata you want to appear once your data is published. For instance, you
 might want to add your data to the HamSCI community so that it can be found
 by others!
-6. Save your changes. Once you hit save, the ID for the object you've just
+4. Save your changes. Once you hit save, the ID for the object you've just
 created should show up in the URL bar in your browser. The ID is the number at
 the end of the URL (for instance, the "518035" in
 https://sandbox.zenodo.org/deposit/518035) Copy this ID.
-7. Paste the ID into `current-target.json`.
-8. That should be all the configuration. Try running the script, and see what
+5. Paste the ID into `current-target.json`.
+6. That should be all the configuration. Try running the script, and see what
 happens.
 
 
