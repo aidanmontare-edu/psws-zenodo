@@ -51,7 +51,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--path',
                     default=read_local_path(),
                     help="The file(s) to include in the upload. If no path is"
-                    " specified, the path stored in the file `config/secrets.json`
+                    " specified, the path stored in the file `config/secrets.json`"
                     " is used ")
 # parser.add_argument('-m', '--metadata-file',
 #                     help="JSON file containing metadata for the upload.")
