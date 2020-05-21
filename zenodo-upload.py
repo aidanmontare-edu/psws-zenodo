@@ -312,7 +312,8 @@ def do():
     now = datetime.now(timezone.utc)
     # update the date on the deposition
     r = requests.put(new_target_url,
-                     data={"metadata": {"publication_date": now.isoformat()}})
+                     data={"metadata": {"publication_date": now.isoformat()}},
+                     params={'access_token': args.token})
     print("Changed time with status code", r.status_code)
     
     if r.status_code == 401:
