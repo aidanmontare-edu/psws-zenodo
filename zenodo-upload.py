@@ -297,6 +297,9 @@ def do():
                      data={"metadata": {"publication_date": now.isoformat()}})
     print("Changed time with status code", r.status_code)
     
+    if r.status_code == 401:
+        print(r.json())
+    
     # publish the new deposiiton version
     r = requests.post(new_target_url + "/actions/publish",
                       params={'access_token': args.token})
