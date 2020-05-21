@@ -28,13 +28,31 @@ def read_access_token():
         raise Exception("You must either provide an access token"
                         " on the commnad line or in the file"
                         " `config/secrets.json`")
+        
+def read_local_path():
+    """
+    Reads the local path from `secrets.json` file.
+    
+    Todo elimitate repeated code
+    """
+    try:
+        # We store our various secrets in an aptly named file
+        with open('config/secrets.json', 'r') as data_file:
+            return json.load(data_file)['local_path']
+    except FileNotFoundError:
+        raise Exception("You must either provide a local path"
+                        " on the commnad line or in the file"
+                        " `config/secrets.json`")
+
 
 parser = argparse.ArgumentParser(
     description="Upload the given file(s) to Zenodo via the REST API."
                 " In development, so arguments and behavior my vary.")
 parser.add_argument('--path',
-                    default='C:\\Users\\aidan\\Documents\\W8EDU\\psws-zenodo\\test-files',
-                    help="The file(s) to include in the upload.")
+                    default=read_local_path(),
+                    help="The file(s) to include in the upload. If no path is"
+                    " specified, the path stored in the file `config/secrets.json`
+                    " is used ")
 # parser.add_argument('-m', '--metadata-file',
 #                     help="JSON file containing metadata for the upload.")
 parser.add_argument('-t', '--token', default=read_access_token(),
@@ -46,7 +64,7 @@ parser.add_argument('-c', '--check', action='store_true',
                     " already uploaded to your Zenodo account,"
                     " but don't make any changes.")
 parser.add_argument('-w', '--watch', action='store_true',
-                    help="Instead of running once, run continuously "
+                    help="Instead of running once, run continuously"
                     " and watch for changes to the file(s) at the"
                     " specified path(s). An upload will be triggered"
                     " anytime a change is detected")
