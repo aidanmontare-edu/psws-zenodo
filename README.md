@@ -30,7 +30,7 @@ To use:
 supplying the command line argument.
 2. Create an account at sandbox.zenodo.org and then an access token. Your
 access token must both the `deposit:action` and the `deposit:write` scopes.
-3. Rename/copyy the `example-config` directory as `config`, and set your
+3. Rename/copy the `example-config` directory as `config`, and set your
 configuration settings. The access token goes in the file `secrets.json`
 (an example, sans token, has been provided). In the file
 `current-target.json`, "onZenodoSandboxServer" is either
