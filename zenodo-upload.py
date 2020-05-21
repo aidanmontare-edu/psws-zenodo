@@ -313,7 +313,8 @@ def do():
     # update the date on the deposition
     r = requests.put(new_target_url,
                      data={"metadata": {"publication_date": now.isoformat()}},
-                     params={'access_token': args.token})
+                     params={'access_token': args.token},
+                     headers={"Content-Type": "application/json"})
     print("Changed time with status code", r.status_code)
     
     if r.status_code == 401:
