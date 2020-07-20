@@ -1,4 +1,5 @@
 # psws-zenodo
+
 ![GitHub tag (latest SemVer pre-release)](https://img.shields.io/github/v/tag/aidanmontare-edu/psws-zenodo?include_prereleases&sort=semver)
 ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/aidanmontare-edu/psws-zenodo?include_prereleases)
 ![Upload Python Package](https://github.com/aidanmontare-edu/psws-zenodo/workflows/Upload%20Python%20Package/badge.svg)
@@ -8,6 +9,9 @@ Zenodo upload for the HamSCI PSWS project and those running fldigi at home
 
 *This is only a proof of concept. It is still in a very rough phase, and has
 very little error checking.*
+
+
+## Installation and Setup
 
 To install:
 
@@ -61,7 +65,9 @@ Link for creating access token:
 
 https://sandbox.zenodo.org/account/settings/applications/tokens/new/
 
-Todo:
+
+## Todo
+
 - converting UTF-8 plaintext to html (for the zenodo description)
 - handling entire directories and updates
 - demon mode
