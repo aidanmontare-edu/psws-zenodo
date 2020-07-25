@@ -272,13 +272,15 @@ def do():
         return
     
     # create a new version of the deposition so that we can add files
+    # the body of r is not the new version, but the original resource
     r = requests.post(target_url + "/actions/newversion",
                       params={'access_token': args.token})
     # r = makeRequest("post", target_url + "/actions/newversion")
     
-    # get the new version
+    # pull out link to new version
     new_target_url = r.json()["links"]["latest_draft"]
     
+    # get files in the new version
     request = requests.get(new_target_url + "/files",
                            params={'access_token': args.token})
     
@@ -309,8 +311,15 @@ def do():
         if r_df.status_code==400:
             print(r_df.json())
     
+    # update date on the deposition
+    # a. get the existing deposition metadata
+    r = requests.get(renew_target_url,
+                     params={"access_token": args.token})
+    metadata = r.json()["metadata"]
+    # b. update time
     now = datetime.now(timezone.utc)
-    data={"metadata": {"publication_date": now.isoformat()}}
+    metadata["publication_date"] = now.isoformat()
+    data = {"metadata": metadata}
     # update the date on the deposition
     r = requests.put(new_target_url,
                      data=json.dumps(data),
