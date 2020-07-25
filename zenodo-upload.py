@@ -313,7 +313,7 @@ def do():
     
     # update date on the deposition
     # a. get the existing deposition metadata
-    r = requests.get(renew_target_url,
+    r = requests.get(new_target_url,
                      params={"access_token": args.token})
     metadata = r.json()["metadata"]
     # b. update time
