@@ -11,11 +11,11 @@ Zenodo upload for the HamSCI PSWS project and those running fldigi at home
 very little error checking.*
 
 
-## Installation and Setup
+## Installation
 
-To install:
-
-**Note: While this code is published as a test package, the packaged form does not work correctly yet. For now, you should run this code by downloading the repository directly, rather than trying to use PyPI**
+**Note: While this code is published as a test package, the packaged form does
+not work correctly yet. For now, you should download or clone the git repository
+directly, rather than trying to use PyPI**
 
 This project is currently
 [hosted on the Test PyPI server](https://test.pypi.org/project/psws-zendo/).
@@ -24,18 +24,19 @@ Python 3 as `pip3`):
 
 `pip3 install --upgrade -i https://test.pypi.org/simple/ --no-deps psws-zendo`
 
-Once you have this, you should be able to run it with
-`python3 psws-zenodo.py` or `psws-zenodo.py`. Note that reading the
-config files may not work yet.
+Once you have this, you should follow the setup instructions below.
 
 In the future, this project will be hosted on the main Python Package Index.
+
+
+## Setup and Usage
 
 To use:
 
 1. Create an account at sandbox.zenodo.org and then an access token. Your
-access token must both the `deposit:action` and the `deposit:write` scopes.
+access token must have both the `deposit:action` and the `deposit:write` scopes.
 2. Rename/copy the `example-config` directory as `config`, and set your
-configuration settings. There are several to set.
+configuration settings in each file. There are several to set:
 
 The access token goes in the file `secrets.json`
 (an example, sans token, has been provided).
@@ -60,10 +61,26 @@ https://sandbox.zenodo.org/deposit/518035) Copy this ID.
 6. That should be all the configuration. Try running the script, and see what
 happens.
 
+You should be able to run the script with `python3 psws-zenodo.py` or
+`psws-zenodo.py`. Note that reading the config files may not work yet if you
+are not in the same directory as `psws-zenodo.py`.
 
-Link for creating access token:
 
-https://sandbox.zenodo.org/account/settings/applications/tokens/new/
+
+Links for creating an access token:
+
+Sandbox: https://sandbox.zenodo.org/account/settings/applications/tokens/new/  
+Regular: https://zenodo.org/account/settings/applications/tokens/new/
+
+
+## Crontab entry
+
+A crontab entry like the following will run the script every day and upload to
+the Zenodo sandbox while sending program output (for debugging) to a text file.
+
+```
+00 01 * * * cd /home/pi/psws-zenodo/ ; python3 /home/pi/psws-zenodo/zenodo-upload.py -s >> /home/pi/psws-zenodo/logs.txt
+```
 
 
 ## Todo
