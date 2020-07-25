@@ -9,3 +9,6 @@ dist/
 .pylint.d/
 *.egg
 *.egg-info
+
+# jupyter
+.ipynb_checkpoints/
