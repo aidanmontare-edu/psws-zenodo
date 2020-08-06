@@ -41,13 +41,14 @@ configuration settings in each file. There are several to set:
 The access token goes in the file `secrets.json`
 (an example, sans token, has been provided).
 
-The path to the files you wish to have uploaded to Zenodo (i.e. your data)
-should be set as `local_path`. You can also specify this as a command line argument.
-
 In the file
 `current-target.json`, "onZenodoSandboxServer" is either
 1 if you are using sandbox.zenodo.org, or 0 for zenodo.org. We'll get the
 value of "id" once we create a Zenodo upload.
+
+Also in that file, the path to the files you wish to have uploaded to Zenodo
+(i.e. your data) should be set as `local_path`. You can also specify this as a
+command line argument.
 
 3. From the Zenodo website, create a new Zenodo upload and specify all the
 metadata you want to appear once your data is published. For instance, you
