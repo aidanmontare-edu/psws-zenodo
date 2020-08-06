@@ -18,6 +18,14 @@ very little error checking.*
 not work correctly yet. For now, you should download or clone the git repository
 directly, rather than trying to use PyPI**
 
+### To download from source:
+
+`git clone https://github.com/aidanmontare-edu/psws-zenodo.git`
+
+or download a .zip from the github page.
+
+### To install from PyPI:
+
 This project is currently
 [hosted on the Test PyPI server](https://test.pypi.org/project/psws-zendo/).
 You can download it from there by running (assuming your system has pip for
@@ -83,6 +91,10 @@ the Zenodo sandbox while sending program output (for debugging) to a text file.
 ```
 00 01 * * * cd /home/pi/psws-zenodo/ ; python3 /home/pi/psws-zenodo/zenodo-upload.py -s >> /home/pi/psws-zenodo/logs.txt
 ```
+
+Note that this will create a new DOI for every day's data. This might be
+wasteful to run on a server that is not the sandbox. Future updates to this
+program might operate differently to try to address this.
 
 
 ## Todo
