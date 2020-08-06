@@ -1,4 +1,5 @@
 {
     "id": 000000,
-    "onZenodoSandboxServer": 1
+    "onZenodoSandboxServer": 1,
+    "local_path": "C:\\Users\\USERNAME\\PATH\\TO\\FILES\\TO\\UPLOAD"
 }

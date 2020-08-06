@@ -38,12 +38,12 @@ def read_local_path():
     """
     try:
         # We store our various secrets in an aptly named file
-        with open('config/secrets.json', 'r') as data_file:
+        with open('config/current-target.json', 'r') as data_file:
             return json.load(data_file)['local_path']
     except FileNotFoundError:
         raise Exception("You must either provide a local path"
                         " on the commnad line or in the file"
-                        " `config/secrets.json`")
+                        " `config/current-target.json`")
 
 
 parser = argparse.ArgumentParser(
@@ -52,7 +52,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--path',
                     default=read_local_path(),
                     help="The file(s) to include in the upload. If no path is"
-                    " specified, the path stored in the file `config/secrets.json`"
+                    " specified, the path stored in the file `config/current-target.json`"
                     " is used ")
 # parser.add_argument('-m', '--metadata-file',
 #                     help="JSON file containing metadata for the upload.")
