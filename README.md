@@ -5,6 +5,8 @@
 ![Upload Python Package](https://github.com/aidanmontare-edu/psws-zenodo/workflows/Upload%20Python%20Package/badge.svg)
 ![PyPI](https://img.shields.io/pypi/v/psws-zenodo)
 
+![Linting](https://github.com/aidanmontare-edu/psws-zenodo/workflows/Python%20package/badge.svg)
+
 Zenodo upload for the HamSCI PSWS project and those running fldigi at home
 
 *This is only a proof of concept. It is still in a very rough phase, and has
